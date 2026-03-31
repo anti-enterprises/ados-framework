@@ -1,0 +1,243 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ados-framework setup script
+# Installs owned assets into the current project and optionally pulls upstream dependencies.
+#
+# Usage:
+#   ./bin/setup [--minimal | --full | --dry-run]
+#
+# Modes:
+#   --minimal   Install only owned assets (agents, commands, helpers, execute-plan)
+#   --full      Install owned assets + pull all upstream dependencies
+#   --dry-run   Show what would be installed without making changes
+#   (default)   Same as --minimal
+
+SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+TARGET_DIR="${ADOS_TARGET_DIR:-$(pwd)}"
+MODE="${1:---minimal}"
+DRY_RUN=false
+
+case "$MODE" in
+  --dry-run)  DRY_RUN=true ;;
+  --minimal)  ;;
+  --full)     ;;
+  --help|-h)
+    echo "Usage: ./bin/setup [--minimal | --full | --dry-run]"
+    echo ""
+    echo "  --minimal   Install owned assets only (default)"
+    echo "  --full      Install owned assets + upstream dependencies"
+    echo "  --dry-run   Preview what would be installed"
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $MODE"
+    echo "Run ./bin/setup --help for usage"
+    exit 1
+    ;;
+esac
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+info()  { echo -e "${BLUE}[ados]${NC} $*"; }
+ok()    { echo -e "${GREEN}[ados]${NC} $*"; }
+warn()  { echo -e "${YELLOW}[ados]${NC} $*"; }
+err()   { echo -e "${RED}[ados]${NC} $*"; }
+
+# ---------------------------------------------------------------------------
+# Preflight checks
+# ---------------------------------------------------------------------------
+
+info "ados-framework setup"
+info "Source:  $SCRIPT_DIR"
+info "Target:  $TARGET_DIR"
+info "Mode:    $MODE"
+echo ""
+
+if [ ! -d "$HOME/.claude" ]; then
+  err "Claude Code not detected (~/.claude/ not found)"
+  err "Install Claude Code first: https://claude.ai/code"
+  exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# Copy helper: respects --dry-run
+# ---------------------------------------------------------------------------
+
+copy_dir() {
+  local src="$1" dst="$2" label="$3"
+  local count
+  count=$(find "$src" -type f | wc -l | tr -d ' ')
+
+  if $DRY_RUN; then
+    info "[dry-run] Would copy $count files: $label"
+  else
+    mkdir -p "$dst"
+    cp -R "$src"/* "$dst"/ 2>/dev/null || true
+    ok "Copied $count files: $label"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Phase 1: Owned assets
+# ---------------------------------------------------------------------------
+
+info "=== Phase 1: Installing owned assets ==="
+echo ""
+
+# Commands
+copy_dir "$SCRIPT_DIR/.claude/commands" "$TARGET_DIR/.claude/commands" "slash commands"
+
+# Agents
+copy_dir "$SCRIPT_DIR/.claude/agents" "$TARGET_DIR/.claude/agents" "agent definitions"
+
+# Helpers
+copy_dir "$SCRIPT_DIR/.claude/helpers" "$TARGET_DIR/.claude/helpers" "hook handlers"
+
+# Execute-plan pipeline
+copy_dir "$SCRIPT_DIR/scripts/execute-plan" "$TARGET_DIR/scripts/execute-plan" "execute-plan pipeline"
+
+# Tests
+copy_dir "$SCRIPT_DIR/tests/execute-plan" "$TARGET_DIR/tests/execute-plan" "execute-plan tests"
+
+# Skills
+copy_dir "$SCRIPT_DIR/skills" "$TARGET_DIR/skills" "SPARC methodology skill"
+
+# Config
+if $DRY_RUN; then
+  info "[dry-run] Would copy claude-flow config"
+else
+  mkdir -p "$TARGET_DIR/.claude-flow"
+  if [ ! -f "$TARGET_DIR/.claude-flow/config.yaml" ]; then
+    cp "$SCRIPT_DIR/config/claude-flow.yaml" "$TARGET_DIR/.claude-flow/config.yaml"
+    ok "Created .claude-flow/config.yaml"
+  else
+    warn ".claude-flow/config.yaml already exists, skipping"
+  fi
+fi
+
+# Settings template
+if $DRY_RUN; then
+  info "[dry-run] Would merge settings template"
+else
+  if [ ! -f "$TARGET_DIR/.claude/settings.json" ]; then
+    cp "$SCRIPT_DIR/.claude/settings.template.json" "$TARGET_DIR/.claude/settings.json"
+    ok "Created .claude/settings.json from template"
+  else
+    warn ".claude/settings.json already exists"
+    info "Merge manually from: $SCRIPT_DIR/.claude/settings.template.json"
+  fi
+fi
+
+echo ""
+
+# ---------------------------------------------------------------------------
+# Phase 2: Upstream dependencies (--full only)
+# ---------------------------------------------------------------------------
+
+if [ "$MODE" = "--full" ]; then
+  info "=== Phase 2: Installing upstream dependencies ==="
+  echo ""
+
+  # claude-flow MCP
+  if command -v npx &>/dev/null; then
+    if $DRY_RUN; then
+      info "[dry-run] Would configure claude-flow MCP server"
+    else
+      info "Configuring claude-flow MCP server..."
+      claude mcp add claude-flow -- npx -y @claude-flow/cli@latest mcp start 2>/dev/null && \
+        ok "claude-flow MCP configured" || \
+        warn "claude-flow MCP setup failed — configure manually: claude mcp add claude-flow -- npx -y @claude-flow/cli@latest mcp start"
+    fi
+  else
+    warn "npx not found — install Node.js to use claude-flow"
+  fi
+
+  # gstack
+  if [ -d "$HOME/.claude/skills/gstack" ]; then
+    ok "gstack already installed at ~/.claude/skills/gstack"
+  else
+    if $DRY_RUN; then
+      info "[dry-run] Would install gstack from garrytan/gstack"
+    else
+      info "Installing gstack..."
+      git clone --depth 1 https://github.com/garrytan/gstack.git "$HOME/.claude/skills/gstack" && \
+        cd "$HOME/.claude/skills/gstack" && ./setup && \
+        ok "gstack installed" || \
+        warn "gstack install failed — install manually: git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup"
+    fi
+  fi
+
+  # Superpowers plugin
+  if [ -d "$HOME/.claude/plugins/cache/claude-plugins-official/superpowers" ]; then
+    ok "superpowers plugin already installed"
+  else
+    if $DRY_RUN; then
+      info "[dry-run] Would install superpowers plugin"
+    else
+      info "Installing superpowers plugin..."
+      claude plugins install superpowers@claude-plugins-official 2>/dev/null && \
+        ok "superpowers installed" || \
+        warn "superpowers install failed — install manually: claude plugins install superpowers@claude-plugins-official"
+    fi
+  fi
+
+  # Frontend design plugin
+  if [ -d "$HOME/.claude/plugins/cache/claude-plugins-official/frontend-design" ]; then
+    ok "frontend-design plugin already installed"
+  else
+    if $DRY_RUN; then
+      info "[dry-run] Would install frontend-design plugin"
+    else
+      info "Installing frontend-design plugin..."
+      claude plugins install frontend-design@claude-plugins-official 2>/dev/null && \
+        ok "frontend-design installed" || \
+        warn "frontend-design install failed — install manually"
+    fi
+  fi
+
+  echo ""
+fi
+
+# ---------------------------------------------------------------------------
+# Phase 3: TypeScript dependencies
+# ---------------------------------------------------------------------------
+
+if [ -f "$TARGET_DIR/package.json" ]; then
+  if $DRY_RUN; then
+    info "[dry-run] Would install npm dependencies"
+  else
+    info "Installing npm dependencies..."
+    cd "$TARGET_DIR"
+    if command -v pnpm &>/dev/null; then
+      pnpm install --silent && ok "Dependencies installed (pnpm)"
+    elif command -v npm &>/dev/null; then
+      npm install --silent && ok "Dependencies installed (npm)"
+    else
+      warn "No package manager found — run 'npm install' manually"
+    fi
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# Summary
+# ---------------------------------------------------------------------------
+
+echo ""
+info "=== Setup Complete ==="
+echo ""
+ok "Owned assets installed to $TARGET_DIR"
+if [ "$MODE" = "--full" ]; then
+  ok "Upstream dependencies configured"
+fi
+echo ""
+info "Next steps:"
+info "  1. Review .claude/settings.json (merge template if needed)"
+info "  2. Run 'npx vitest run' to verify tests pass"
+info "  3. Try '/execute-plan --dry-run' with a plan file"
+echo ""

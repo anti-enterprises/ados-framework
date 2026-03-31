@@ -1,0 +1,28 @@
+node_modules/
+dist/
+
+# Runtime state (never commit)
+.claude-flow/data/
+.claude-flow/metrics/
+.claude-flow/sessions/
+.claude-flow/security/
+.claude-flow/logs/
+.claude/runs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Test artifacts
+coverage/

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://github.com/anti-enterprises/ados-framework/blob/main/docs/manifest-schema.json",
+  "version": "1",
+  "description": "Upstream dependency manifest for ados-framework. Used by bin/setup to pull and configure external packages.",
+  "upstreams": {
+    "claude-flow": {
+      "source": "npm",
+      "package": "@claude-flow/cli",
+      "version": "latest",
+      "required": true,
+      "install": "claude mcp add claude-flow -- npx -y @claude-flow/cli@latest mcp start",
+      "verify": "npx @claude-flow/cli@latest --version",
+      "description": "Runtime execution engine — agent spawning, task management, swarm coordination, memory"
+    },
+    "gstack": {
+      "source": "github",
+      "repo": "garrytan/gstack",
+      "ref": "main",
+      "required": false,
+      "install": "git clone --depth 1 https://github.com/garrytan/gstack.git \"$HOME/.claude/skills/gstack\" && cd \"$HOME/.claude/skills/gstack\" && ./setup",
+      "verify": "test -f \"$HOME/.claude/skills/gstack/VERSION\"",
+      "description": "Planning and QA skills — /writing-plans, /ship, /review, /qa, /browse, /design-review"
+    },
+    "superpowers": {
+      "source": "plugin",
+      "marketplace": "claude-plugins-official",
+      "name": "superpowers",
+      "required": true,
+      "install": "claude plugins install superpowers@claude-plugins-official",
+      "verify": "test -d \"$HOME/.claude/plugins/cache/claude-plugins-official/superpowers\"",
+      "description": "Core workflow skills — brainstorming, TDD, debugging, verification, code review"
+    },
+    "frontend-design": {
+      "source": "plugin",
+      "marketplace": "claude-plugins-official",
+      "name": "frontend-design",
+      "required": false,
+      "install": "claude plugins install frontend-design@claude-plugins-official",
+      "verify": "test -d \"$HOME/.claude/plugins/cache/claude-plugins-official/frontend-design\"",
+      "description": "UI/UX design patterns for React, Next.js, and web components"
+    },
+    "context7": {
+      "source": "plugin",
+      "marketplace": "claude-plugins-official",
+      "name": "context7",
+      "required": false,
+      "install": "claude plugins install context7@claude-plugins-official",
+      "verify": "test -d \"$HOME/.claude/plugins/cache/claude-plugins-official/context7\"",
+      "description": "Live documentation fetching for libraries and frameworks"
+    }
+  },
+  "optional_skills": {
+    "motion-designer": {
+      "source": "github",
+      "repo": "dylantarre/animation-principles",
+      "path": "skills/motion-designer",
+      "install": "claude skills install dylantarre/animation-principles:skills/motion-designer",
+      "description": "Animation and motion design principles"
+    },
+    "vercel-react-best-practices": {
+      "source": "github",
+      "repo": "vercel-labs/agent-skills",
+      "path": "skills/vercel-react-best-practices",
+      "install": "claude skills install vercel-labs/agent-skills:skills/vercel-react-best-practices",
+      "description": "React/Next.js performance optimization from Vercel Engineering"
+    }
+  }
+}

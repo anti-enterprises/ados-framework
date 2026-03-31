@@ -1,0 +1,42 @@
+{
+  "name": "ados-framework",
+  "version": "0.1.0",
+  "description": "Cross-framework AI development skills for Claude Code — bridges gstack planning, SPARC roles, and RuFlo execution",
+  "author": "joe@anti.enterprises",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anti-enterprises/ados-framework.git"
+  },
+  "homepage": "https://github.com/anti-enterprises/ados-framework",
+  "bugs": {
+    "url": "https://github.com/anti-enterprises/ados-framework/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "setup": "./bin/setup",
+    "setup:minimal": "./bin/setup --minimal",
+    "setup:full": "./bin/setup --full"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "claude-code",
+    "ai-development",
+    "sparc",
+    "ruflo",
+    "gstack",
+    "multi-agent",
+    "developer-tools",
+    "skills"
+  ]
+}
