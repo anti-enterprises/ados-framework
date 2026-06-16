@@ -1,0 +1,279 @@
+{
+  "version": "1",
+  "description": "Curated software-development skills exposed by ADOS for Claude Code and Codex team usage.",
+  "excludedCategories": ["marketing", "sales", "operator"],
+  "skills": [
+    {
+      "id": "brainstorming",
+      "name": "brainstorming",
+      "category": "planning",
+      "source": "superpowers",
+      "path": "../superpowers/brainstorming/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "writing-plans",
+      "name": "writing-plans",
+      "category": "planning",
+      "source": "superpowers",
+      "path": "../superpowers/writing-plans/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "executing-plans",
+      "name": "executing-plans",
+      "category": "planning",
+      "source": "superpowers",
+      "path": "../superpowers/executing-plans/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "subagent-driven-development",
+      "name": "subagent-driven-development",
+      "category": "planning",
+      "source": "superpowers",
+      "path": "../superpowers/subagent-driven-development/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "dispatching-parallel-agents",
+      "name": "dispatching-parallel-agents",
+      "category": "planning",
+      "source": "superpowers",
+      "path": "../superpowers/dispatching-parallel-agents/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "test-driven-development",
+      "name": "test-driven-development",
+      "category": "implementation",
+      "source": "superpowers",
+      "path": "../superpowers/test-driven-development/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "systematic-debugging",
+      "name": "systematic-debugging",
+      "category": "debugging",
+      "source": "superpowers",
+      "path": "../superpowers/systematic-debugging/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "verification-before-completion",
+      "name": "verification-before-completion",
+      "category": "verification",
+      "source": "superpowers",
+      "path": "../superpowers/verification-before-completion/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "requesting-code-review",
+      "name": "requesting-code-review",
+      "category": "review",
+      "source": "superpowers",
+      "path": "../superpowers/requesting-code-review/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "receiving-code-review",
+      "name": "receiving-code-review",
+      "category": "review",
+      "source": "superpowers",
+      "path": "../superpowers/receiving-code-review/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "finishing-a-development-branch",
+      "name": "finishing-a-development-branch",
+      "category": "release",
+      "source": "superpowers",
+      "path": "../superpowers/finishing-a-development-branch/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "using-git-worktrees",
+      "name": "using-git-worktrees",
+      "category": "workflow",
+      "source": "superpowers",
+      "path": "../superpowers/using-git-worktrees/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "writing-skills",
+      "name": "writing-skills",
+      "category": "workflow",
+      "source": "superpowers",
+      "path": "../superpowers/writing-skills/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "careful",
+      "name": "careful",
+      "category": "review",
+      "source": "gstack",
+      "path": "../gstack/careful/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "investigate",
+      "name": "investigate",
+      "category": "research",
+      "source": "gstack",
+      "path": "../gstack/investigate/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "plan-eng-review",
+      "name": "plan-eng-review",
+      "category": "planning",
+      "source": "gstack",
+      "path": "../gstack/plan-eng-review/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "qa-only",
+      "name": "qa-only",
+      "category": "verification",
+      "source": "gstack",
+      "path": "../gstack/qa-only/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "qa",
+      "name": "qa",
+      "category": "verification",
+      "source": "gstack",
+      "path": "../gstack/qa/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "review",
+      "name": "review",
+      "category": "review",
+      "source": "gstack",
+      "path": "../gstack/review/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "design-review",
+      "name": "design-review",
+      "category": "review",
+      "source": "gstack",
+      "path": "../gstack/design-review/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "browse",
+      "name": "browse",
+      "category": "verification",
+      "source": "gstack",
+      "path": "../gstack/browse/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "ship",
+      "name": "ship",
+      "category": "release",
+      "source": "gstack",
+      "path": "../gstack/ship/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "frontend-design",
+      "name": "frontend-design",
+      "category": "frontend",
+      "source": "community",
+      "path": "../community-skills/frontend-design/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "vercel-react-best-practices",
+      "name": "vercel-react-best-practices",
+      "category": "frontend",
+      "source": "community",
+      "path": "../community-skills/vercel-react-best-practices/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "motion-designer",
+      "name": "motion-designer",
+      "category": "frontend",
+      "source": "community",
+      "path": "../community-skills/motion-designer/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "frontend-performance",
+      "name": "frontend-performance",
+      "category": "frontend",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "frontend-ui-animator",
+      "name": "frontend-ui-animator",
+      "category": "frontend",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "ux-content-design",
+      "name": "ux-content-design",
+      "category": "frontend",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "graphify",
+      "name": "graphify",
+      "category": "analysis",
+      "source": "community",
+      "path": "../community-skills/graphify/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "security-review",
+      "name": "security-review",
+      "category": "security",
+      "source": "ados",
+      "path": ".claude/commands/sparc/security-review.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "security-best-practices",
+      "name": "security-best-practices",
+      "category": "security",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "playwright",
+      "name": "playwright",
+      "category": "verification",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "measurement",
+      "name": "measurement",
+      "category": "instrumentation",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "vercel-deploy",
+      "name": "vercel-deploy",
+      "category": "release",
+      "source": "personal",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "context7",
+      "name": "context7",
+      "category": "research",
+      "source": "plugin",
+      "agentTargets": ["claude", "codex"]
+    }
+  ]
+}

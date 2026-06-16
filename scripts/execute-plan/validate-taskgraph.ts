@@ -6,6 +6,7 @@
  */
 
 import { CANONICAL_TASK_TYPES, type TaskGraph } from "./types.js";
+import { assertKnownSkillIds } from "./developer-skills.js";
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -18,6 +19,7 @@ export function validateGraph(graph: TaskGraph): void {
   try { validateNonEmpty(graph); } catch (e) { errors.push(msg(e)); }
   try { validateUniqueIds(graph); } catch (e) { errors.push(msg(e)); }
   try { validateTaskTypes(graph); } catch (e) { errors.push(msg(e)); }
+  try { validateSkillIds(graph); } catch (e) { errors.push(msg(e)); }
   try { validateDependencies(graph); } catch (e) { errors.push(msg(e)); }
   try { detectCycles(graph); } catch (e) { errors.push(msg(e)); }
 
@@ -63,6 +65,14 @@ export function validateTaskTypes(graph: TaskGraph): void {
 
   if (invalid.length > 0) {
     throw new Error(`Unknown task types: ${invalid.join("; ")}`);
+  }
+}
+
+export function validateSkillIds(graph: TaskGraph): void {
+  for (const task of graph.tasks) {
+    if (task.skillIds && task.skillIds.length > 0) {
+      assertKnownSkillIds(task.skillIds, `task "${task.id}"`);
+    }
   }
 }
 

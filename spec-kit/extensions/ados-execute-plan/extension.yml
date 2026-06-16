@@ -1,0 +1,25 @@
+schema_version: "1.0"
+
+extension:
+  id: "ados-execute-plan"
+  name: "ADOS Execute Plan"
+  version: "0.1.0"
+  description: "Bridge Spec Kit tasks into ADOS execution"
+  author: "Anti Enterprises"
+  repository: "https://github.com/anti-enterprises/ados-framework"
+  license: "MIT"
+  homepage: "https://github.com/anti-enterprises/ados-framework"
+
+requires:
+  speckit_version: ">=0.8.5"
+
+provides:
+  commands:
+    - name: "speckit.ados-execute-plan"
+      file: "commands/speckit.ados-execute-plan.md"
+      description: "Dry-run or execute ADOS from Spec Kit tasks.md"
+
+tags:
+  - "process"
+  - "execution"
+  - "ados"

@@ -36,7 +36,10 @@ Return ONLY valid JSON matching this structure (no markdown fences, no commentar
       "files": { "create": ["path", ...], "modify": ["path", ...] },
       "steps": ["step text", ...],
       "priority": "high | normal | low",
-      "parallelizable": true | false
+      "parallelizable": true | false,
+      "source": "optional string — originating artifact such as speckit:specs/001-feature/tasks.md",
+      "story": "optional string — user story label such as US1",
+      "skillIds": ["optional developer skill IDs to attach in addition to the task type defaults"]
     }
   ]
 }
@@ -103,7 +106,7 @@ export function validateNormalizedOutput(json: unknown): TaskGraph {
     const desc = requireString(raw, "desc", label);
     const type = normalizeType(optionalString(raw, "type", "implement"), label);
 
-    tasks.push({
+    const task: CanonicalTask = {
       id,
       phase,
       type,
@@ -115,7 +118,17 @@ export function validateNormalizedOutput(json: unknown): TaskGraph {
       steps: optionalStringArray(raw, "steps"),
       priority: normalizePriority(optionalString(raw, "priority", "normal")),
       parallelizable: typeof raw.parallelizable === "boolean" ? raw.parallelizable : true,
-    });
+    };
+
+    const source = optionalStringOrUndefined(raw, "source");
+    const story = optionalStringOrUndefined(raw, "story");
+    const skillIds = optionalStringArray(raw, "skillIds");
+
+    if (source) task.source = source;
+    if (story) task.story = story;
+    if (skillIds.length > 0) task.skillIds = skillIds;
+
+    tasks.push(task);
   }
 
   if (tasks.length === 0) {
@@ -141,6 +154,12 @@ function optionalString(obj: Record<string, unknown>, key: string, fallback: str
   const val = obj[key];
   if (typeof val === "string" && val.trim() !== "") return val.trim();
   return fallback;
+}
+
+function optionalStringOrUndefined(obj: Record<string, unknown>, key: string): string | undefined {
+  const val = obj[key];
+  if (typeof val === "string" && val.trim() !== "") return val.trim();
+  return undefined;
 }
 
 function optionalStringArray(obj: Record<string, unknown>, key: string): string[] {

@@ -81,6 +81,9 @@ export interface CanonicalTask {
   steps: string[];
   priority: Priority;
   parallelizable: boolean;
+  source?: string;
+  story?: string;
+  skillIds?: string[];
 }
 
 export interface TaskGraph {

@@ -1,0 +1,36 @@
+schema_version: "1.0"
+
+preset:
+  id: "ados"
+  name: "ADOS Engineering"
+  version: "0.1.0"
+  description: "ADOS software engineering standards for Spec Kit artifacts"
+  author: "Anti Enterprises"
+  repository: "https://github.com/anti-enterprises/ados-framework"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.8.5"
+
+provides:
+  templates:
+    - type: "artifact"
+      name: "constitution-template"
+      file: "templates/constitution-template.md"
+      description: "ADOS engineering constitution"
+      replaces: "constitution-template"
+    - type: "artifact"
+      name: "plan-template"
+      file: "templates/plan-template.md"
+      description: "ADOS implementation plan expectations"
+      replaces: "plan-template"
+    - type: "artifact"
+      name: "tasks-template"
+      file: "templates/tasks-template.md"
+      description: "ADOS task breakdown expectations"
+      replaces: "tasks-template"
+
+tags:
+  - "engineering"
+  - "ados"
+  - "quality"

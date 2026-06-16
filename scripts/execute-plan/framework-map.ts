@@ -13,6 +13,7 @@
  */
 
 import type { CanonicalTaskType, FrameworkMapEntry, CanonicalTask, MappedTask } from "./types.js";
+import { assertKnownSkillIds } from "./developer-skills.js";
 
 // ---------------------------------------------------------------------------
 // The Map
@@ -22,7 +23,7 @@ export const FRAMEWORK_MAP: Record<CanonicalTaskType, FrameworkMapEntry> = {
   design: {
     sparcRole: "architect",
     rufloAgent: "architect",
-    skills: ["writing-plans", "careful"],
+    skills: ["writing-plans", "plan-eng-review", "careful"],
     validator: "design-review",
     timeoutSec: 900,
     retries: 0,
@@ -37,7 +38,7 @@ export const FRAMEWORK_MAP: Record<CanonicalTaskType, FrameworkMapEntry> = {
   implement: {
     sparcRole: "coder",
     rufloAgent: "coder",
-    skills: ["test-driven-development", "verification-before-completion"],
+    skills: ["test-driven-development", "verification-before-completion", "careful"],
     validator: "qa",
     timeoutSec: 1800,
     retries: 1,
@@ -52,7 +53,7 @@ export const FRAMEWORK_MAP: Record<CanonicalTaskType, FrameworkMapEntry> = {
   test: {
     sparcRole: "reviewer",
     rufloAgent: "tester",
-    skills: ["qa-only", "review"],
+    skills: ["qa-only", "verification-before-completion"],
     validator: "qa",
     timeoutSec: 1200,
     retries: 0,
@@ -66,7 +67,7 @@ export const FRAMEWORK_MAP: Record<CanonicalTaskType, FrameworkMapEntry> = {
   debug: {
     sparcRole: "debugger",
     rufloAgent: "debugger",
-    skills: ["systematic-debugging", "careful"],
+    skills: ["systematic-debugging", "investigate", "careful"],
     validator: "verification-before-completion",
     timeoutSec: 1800,
     retries: 1,
@@ -80,7 +81,7 @@ export const FRAMEWORK_MAP: Record<CanonicalTaskType, FrameworkMapEntry> = {
   review: {
     sparcRole: "reviewer",
     rufloAgent: "reviewer",
-    skills: ["review", "careful"],
+    skills: ["review", "requesting-code-review", "security-review", "careful"],
     validator: "qa",
     timeoutSec: 900,
     retries: 0,
@@ -94,7 +95,7 @@ export const FRAMEWORK_MAP: Record<CanonicalTaskType, FrameworkMapEntry> = {
   research: {
     sparcRole: "architect",
     rufloAgent: "researcher",
-    skills: ["investigate"],
+    skills: ["investigate", "context7", "graphify"],
     timeoutSec: 900,
     retries: 0,
     promptTemplate: [
@@ -120,17 +121,29 @@ export function getMapping(taskType: CanonicalTaskType): FrameworkMapEntry {
   return entry;
 }
 
+export function validateFrameworkMapSkills(
+  map: Record<CanonicalTaskType, FrameworkMapEntry> = FRAMEWORK_MAP,
+): void {
+  for (const [taskType, entry] of Object.entries(map)) {
+    const skillIds = entry.validator ? [...entry.skills, entry.validator] : entry.skills;
+    assertKnownSkillIds(skillIds, `framework map "${taskType}"`);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Apply mapping to a task
 // ---------------------------------------------------------------------------
 
 export function applyMapping(task: CanonicalTask, level: number): MappedTask {
   const entry = getMapping(task.type);
+  const skills = mergeSkillIds(entry.skills, task.skillIds ?? []);
+  assertKnownSkillIds(skills, `task "${task.id}"`);
+
   return {
     ...task,
     sparcRole: entry.sparcRole,
     rufloAgent: entry.rufloAgent,
-    skills: entry.skills,
+    skills,
     validator: entry.validator,
     timeoutSec: entry.timeoutSec,
     retries: entry.retries,
@@ -148,6 +161,13 @@ export function composeTaskPrompt(task: MappedTask): string {
     `## Role\n${task.promptTemplate}`,
     `## Task\n**${task.title}**\n${task.desc}`,
   ];
+
+  const provenance: string[] = [];
+  if (task.source) provenance.push(`Source: ${task.source}`);
+  if (task.story) provenance.push(`Story: ${task.story}`);
+  if (provenance.length > 0) {
+    sections.push(`## Provenance\n${provenance.join("\n")}`);
+  }
 
   if (task.files.create.length > 0 || task.files.modify.length > 0) {
     const fileLines: string[] = [];
@@ -177,4 +197,8 @@ export function composeTaskPrompt(task: MappedTask): string {
   }
 
   return sections.join("\n\n");
+}
+
+function mergeSkillIds(defaultSkills: readonly string[], explicitSkills: readonly string[]): string[] {
+  return Array.from(new Set([...defaultSkills, ...explicitSkills]));
 }

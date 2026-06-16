@@ -47,6 +47,16 @@
       "install": "claude plugins install context7@claude-plugins-official",
       "verify": "test -d \"$HOME/.claude/plugins/cache/claude-plugins-official/context7\"",
       "description": "Live documentation fetching for libraries and frameworks"
+    },
+    "spec-kit": {
+      "source": "github",
+      "repo": "github/spec-kit",
+      "package": "specify-cli",
+      "version": "latest",
+      "required": false,
+      "install": "pipx install git+https://github.com/github/spec-kit.git",
+      "verify": "specify --version",
+      "description": "GitHub Spec Kit specify CLI for spec-driven development artifacts"
     }
   },
   "optional_skills": {

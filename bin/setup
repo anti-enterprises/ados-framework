@@ -5,34 +5,62 @@ set -euo pipefail
 # Installs owned assets into the current project and optionally pulls upstream dependencies.
 #
 # Usage:
-#   ./bin/setup [--minimal | --full | --dry-run]
+#   ./bin/setup [--minimal | --full | --dry-run] [--agents=claude|codex|both]
 #
 # Modes:
 #   --minimal   Install only owned assets (agents, commands, helpers, execute-plan)
 #   --full      Install owned assets + pull all upstream dependencies
 #   --dry-run   Show what would be installed without making changes
-#   (default)   Same as --minimal
+#   --agents    Install agent-specific assets. Default: claude
+#   (default)   Same as --minimal --agents=claude
 
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TARGET_DIR="${ADOS_TARGET_DIR:-$(pwd)}"
-MODE="${1:---minimal}"
+MODE="--minimal"
 DRY_RUN=false
+AGENTS="claude"
 
-case "$MODE" in
-  --dry-run)  DRY_RUN=true ;;
-  --minimal)  ;;
-  --full)     ;;
-  --help|-h)
-    echo "Usage: ./bin/setup [--minimal | --full | --dry-run]"
+usage() {
+    echo "Usage: ./bin/setup [--minimal | --full | --dry-run] [--agents=claude|codex|both]"
     echo ""
     echo "  --minimal   Install owned assets only (default)"
     echo "  --full      Install owned assets + upstream dependencies"
     echo "  --dry-run   Preview what would be installed"
-    exit 0
-    ;;
+    echo "  --agents=claude|codex|both"
+    echo "              Install Claude Code assets, Codex assets, or both (default: claude)"
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --dry-run) DRY_RUN=true ;;
+    --minimal|--full) MODE="$1" ;;
+    --agents=*) AGENTS="${1#--agents=}" ;;
+    --agents)
+      shift
+      if [ "$#" -eq 0 ]; then
+        echo "Missing value for --agents"
+        exit 1
+      fi
+      AGENTS="$1"
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Run ./bin/setup --help for usage"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+case "$AGENTS" in
+  claude|codex|both) ;;
   *)
-    echo "Unknown option: $MODE"
-    echo "Run ./bin/setup --help for usage"
+    echo "Invalid --agents value: $AGENTS"
+    echo "Expected: claude, codex, or both"
     exit 1
     ;;
 esac
@@ -57,9 +85,10 @@ info "ados-framework setup"
 info "Source:  $SCRIPT_DIR"
 info "Target:  $TARGET_DIR"
 info "Mode:    $MODE"
+info "Agents:  $AGENTS"
 echo ""
 
-if [ ! -d "$HOME/.claude" ]; then
+if [ "$AGENTS" != "codex" ] && ! $DRY_RUN && [ ! -d "$HOME/.claude" ]; then
   err "Claude Code not detected (~/.claude/ not found)"
   err "Install Claude Code first: https://claude.ai/code"
   exit 1
@@ -91,13 +120,25 @@ info "=== Phase 1: Installing owned assets ==="
 echo ""
 
 # Commands
-copy_dir "$SCRIPT_DIR/.claude/commands" "$TARGET_DIR/.claude/commands" "slash commands"
+if [ "$AGENTS" = "claude" ] || [ "$AGENTS" = "both" ]; then
+  copy_dir "$SCRIPT_DIR/.claude/commands" "$TARGET_DIR/.claude/commands" "Claude slash commands"
 
-# Agents
-copy_dir "$SCRIPT_DIR/.claude/agents" "$TARGET_DIR/.claude/agents" "agent definitions"
+  # Agents
+  copy_dir "$SCRIPT_DIR/.claude/agents" "$TARGET_DIR/.claude/agents" "Claude agent definitions"
 
-# Helpers
-copy_dir "$SCRIPT_DIR/.claude/helpers" "$TARGET_DIR/.claude/helpers" "hook handlers"
+  # Helpers
+  copy_dir "$SCRIPT_DIR/.claude/helpers" "$TARGET_DIR/.claude/helpers" "Claude hook handlers"
+fi
+
+if [ "$AGENTS" = "codex" ] || [ "$AGENTS" = "both" ]; then
+  copy_dir "$SCRIPT_DIR/.agents/skills" "$TARGET_DIR/.agents/skills" "Codex skill wrappers"
+  if $DRY_RUN; then
+    info "[dry-run] Would copy AGENTS.md"
+  else
+    cp "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
+    ok "Copied AGENTS.md"
+  fi
+fi
 
 # Execute-plan pipeline
 copy_dir "$SCRIPT_DIR/scripts/execute-plan" "$TARGET_DIR/scripts/execute-plan" "execute-plan pipeline"
@@ -107,6 +148,12 @@ copy_dir "$SCRIPT_DIR/tests/execute-plan" "$TARGET_DIR/tests/execute-plan" "exec
 
 # Skills
 copy_dir "$SCRIPT_DIR/skills" "$TARGET_DIR/skills" "SPARC methodology skill"
+
+# Developer skill catalog
+copy_dir "$SCRIPT_DIR/config" "$TARGET_DIR/config" "ADOS configuration"
+
+# Spec Kit preset and extension assets
+copy_dir "$SCRIPT_DIR/spec-kit" "$TARGET_DIR/spec-kit" "Spec Kit ADOS assets"
 
 # Config
 if $DRY_RUN; then
@@ -122,15 +169,17 @@ else
 fi
 
 # Settings template
-if $DRY_RUN; then
-  info "[dry-run] Would merge settings template"
-else
-  if [ ! -f "$TARGET_DIR/.claude/settings.json" ]; then
-    cp "$SCRIPT_DIR/.claude/settings.template.json" "$TARGET_DIR/.claude/settings.json"
-    ok "Created .claude/settings.json from template"
+if [ "$AGENTS" = "claude" ] || [ "$AGENTS" = "both" ]; then
+  if $DRY_RUN; then
+    info "[dry-run] Would merge settings template"
   else
-    warn ".claude/settings.json already exists"
-    info "Merge manually from: $SCRIPT_DIR/.claude/settings.template.json"
+    if [ ! -f "$TARGET_DIR/.claude/settings.json" ]; then
+      cp "$SCRIPT_DIR/.claude/settings.template.json" "$TARGET_DIR/.claude/settings.json"
+      ok "Created .claude/settings.json from template"
+    else
+      warn ".claude/settings.json already exists"
+      info "Merge manually from: $SCRIPT_DIR/.claude/settings.template.json"
+    fi
   fi
 fi
 
@@ -201,6 +250,28 @@ if [ "$MODE" = "--full" ]; then
     fi
   fi
 
+  # Spec Kit CLI
+  if command -v specify &>/dev/null; then
+    ok "Spec Kit specify CLI already available"
+  elif command -v uvx &>/dev/null; then
+    if $DRY_RUN; then
+      info "[dry-run] Would use uvx for Spec Kit specify CLI"
+    else
+      ok "Spec Kit can be run with: uvx --from git+https://github.com/github/spec-kit.git specify"
+    fi
+  elif command -v pipx &>/dev/null; then
+    if $DRY_RUN; then
+      info "[dry-run] Would install Spec Kit specify CLI with pipx"
+    else
+      info "Installing Spec Kit specify CLI..."
+      pipx install git+https://github.com/github/spec-kit.git && \
+        ok "Spec Kit specify CLI installed" || \
+        warn "Spec Kit install failed — install manually: pipx install git+https://github.com/github/spec-kit.git"
+    fi
+  else
+    warn "uvx/pipx not found — install Spec Kit manually: https://github.com/github/spec-kit"
+  fi
+
   echo ""
 fi
 
@@ -240,4 +311,6 @@ info "Next steps:"
 info "  1. Review .claude/settings.json (merge template if needed)"
 info "  2. Run 'npx vitest run' to verify tests pass"
 info "  3. Try '/execute-plan --dry-run' with a plan file"
+info "  4. For Spec Kit: 'specify init --here --integration claude' or 'specify init --here --integration codex --integration-options=\"--skills\"'"
+info "  5. Install ADOS Spec Kit assets with 'specify preset add --dev spec-kit/presets/ados' and 'specify extension add --dev spec-kit/extensions/ados-execute-plan'"
 echo ""

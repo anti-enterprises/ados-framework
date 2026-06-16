@@ -4,8 +4,10 @@ Cross-framework AI development skills for [Claude Code](https://claude.ai/code).
 
 ## What's in the box
 
-- **`/execute-plan`** — Takes a Markdown implementation plan, normalizes it into a task graph, maps tasks to SPARC-enriched RuFlo agents, and executes them in dependency order with parallel scheduling
-- **98 agent definitions** — Development, review, testing, security, swarm coordination, consensus, optimization
+- **`/execute-plan`** — Takes a Markdown implementation plan or GitHub Spec Kit `tasks.md`, normalizes it into a task graph, maps tasks to SPARC-enriched RuFlo agents, and executes them in dependency order with parallel scheduling
+- **Developer skill catalog** — Curated Claude/Codex software-engineering skills in `config/developer-skills.json`
+- **Spec Kit bridge** — ADOS preset and extension assets under `spec-kit/` for spec-driven development without vendoring Spec Kit core
+- **99 agent definitions** — Development, review, testing, security, swarm coordination, consensus, optimization
 - **89 slash commands** — Analysis, automation, GitHub integration, hooks, monitoring, optimization, SPARC modes
 - **39 hook handlers** — Routing, memory, learning, session management, security scanning
 - **Framework map** — Canonical registry connecting task types to SPARC roles, RuFlo agents, Claude Code skills, and runtime policy
@@ -21,6 +23,9 @@ cd ados-framework
 
 # Full: also install upstream dependencies (gstack, superpowers, claude-flow)
 ./bin/setup --full
+
+# Install both Claude Code and Codex assets
+./bin/setup --full --agents=both
 
 # Preview: see what would be installed
 ./bin/setup --dry-run
@@ -43,8 +48,12 @@ cd ados-framework
 # Run it through the pipeline
 /execute-plan path/to/plan.md
 
+# Or run GitHub Spec Kit tasks through ADOS
+/execute-plan --from-speckit specs/001-feature/tasks.md
+
 # Dry run (normalize + validate + display, no execution)
 /execute-plan path/to/plan.md --dry-run
+/execute-plan --from-speckit specs/001-feature/tasks.md --dry-run
 
 # Resume a failed run
 /execute-plan --resume
@@ -56,46 +65,67 @@ cd ados-framework
 ### How it works
 
 ```
-Markdown plan → [Normalize] → TaskGraph JSON → [Validate] → [Framework Map] → [DAG Schedule] → [Execute]
-                                                                  ↓
-                                                            SPARC role prompts
-                                                            RuFlo agent types
-                                                            Skill attachment
-                                                            Timeout/retry policy
+Markdown plan ───────→ [Normalize] ──┐
+Spec Kit tasks.md ───→ [Parse] ──────┼→ TaskGraph JSON → [Validate] → [Framework Map] → [DAG Schedule] → [Execute]
+                                      │                         ↓
+                                      └─────────────── curated developer skill catalog
 ```
 
-1. **Normalize** — LLM-mediated Markdown-to-JSON conversion using a strict schema
-2. **Validate** — Unique IDs, dependency checks, cycle detection (Kahn's algorithm)
-3. **Map** — Each task type resolves to a SPARC role + RuFlo agent + skills + policy
-4. **Schedule** — Topological sort into concurrency levels
-5. **Execute** — RuFlo MCP (primary) or Claude Code Task tool (fallback), level by level
-6. **Summarize** — Results JSON + Markdown summary with rerun advice
+1. **Normalize Markdown** — LLM-mediated Markdown-to-JSON conversion using a strict schema
+2. **Parse Spec Kit** — `tasks.md` rows convert deterministically with `[P]`, `[US1]`, file paths, and dependency barriers preserved
+3. **Validate** — Unique IDs, skill IDs, dependency checks, cycle detection (Kahn's algorithm)
+4. **Map** — Each task type resolves to a SPARC role + RuFlo agent + curated skill IDs + policy
+5. **Schedule** — Topological sort into concurrency levels
+6. **Execute** — RuFlo MCP (primary) or Claude Code Task tool (fallback), level by level
+7. **Summarize** — Results JSON + Markdown summary with rerun advice
 
 ### Framework map
 
 | Task Type | SPARC Role | RuFlo Agent | Skills | Timeout |
 |---|---|---|---|---|
-| design | architect | architect | writing-plans, careful | 15m |
-| implement | coder | coder | TDD, verification | 30m |
-| test | reviewer | tester | qa-only, review | 20m |
-| debug | debugger | debugger | systematic-debugging | 30m |
-| review | reviewer | reviewer | review, careful | 15m |
-| research | architect | researcher | investigate | 15m |
+| design | architect | architect | writing-plans, plan-eng-review, careful | 15m |
+| implement | coder | coder | test-driven-development, verification-before-completion, careful | 30m |
+| test | reviewer | tester | qa-only, verification-before-completion | 20m |
+| debug | debugger | debugger | systematic-debugging, investigate, careful | 30m |
+| review | reviewer | reviewer | review, requesting-code-review, security-review, careful | 15m |
+| research | architect | researcher | investigate, context7, graphify | 15m |
+
+### GitHub Spec Kit workflow
+
+ADOS does not vendor GitHub Spec Kit. Initialize Spec Kit in the target project, install the ADOS preset/extension, then hand the generated tasks to `/execute-plan`:
+
+```bash
+specify init --here --integration claude
+# or
+specify init --here --integration codex --integration-options="--skills"
+
+specify preset add --dev /path/to/ados-framework/spec-kit/presets/ados
+specify extension add --dev /path/to/ados-framework/spec-kit/extensions/ados-execute-plan
+```
+
+Recommended flow:
+
+```
+/speckit.constitution -> /speckit.specify -> /speckit.clarify -> /speckit.checklist -> /speckit.plan -> /speckit.tasks -> /speckit.analyze -> /execute-plan --from-speckit ...
+```
 
 ## Project structure
 
 ```
 .claude/
   commands/       89 slash commands by category
-  agents/         98 agent definitions by role
+  agents/         99 agent definitions by role
   helpers/        39 hook handlers and utilities
   settings.template.json
+.agents/
+  skills/         Codex wrappers for ADOS execution and Spec Kit bridge
 scripts/
-  execute-plan/   TypeScript pipeline (9 modules)
+  execute-plan/   TypeScript pipeline (11 modules)
 tests/
-  execute-plan/   Unit tests (40 tests)
+  execute-plan/   Unit tests (48 tests)
 skills/           Bundled skills (SPARC methodology)
-config/           Default configurations
+config/           Default configurations and developer skill catalog
+spec-kit/         ADOS Spec Kit preset and extension assets
 bin/setup         Install script
 manifest.json     Upstream dependency references
 ```
@@ -111,6 +141,7 @@ ados-framework bundles its own agents, commands, and pipeline. It references (bu
 | [gstack](https://github.com/garrytan/gstack) | GitHub | No | Planning and QA — /writing-plans, /ship, /review, /qa, /browse |
 | [frontend-design](https://github.com/anthropics/skills) | Claude Code plugin | No | UI/UX design patterns for React/Next.js |
 | [context7](https://github.com/upstash/context7) | Claude Code plugin | No | Live documentation fetching |
+| [Spec Kit](https://github.com/github/spec-kit) | GitHub | No | Spec-driven development CLI, templates, commands, and integrations |
 
 ## Development
 
