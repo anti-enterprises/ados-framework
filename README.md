@@ -8,7 +8,7 @@ Cross-framework AI development skills for [Claude Code](https://claude.ai/code).
 - **Developer skill catalog** — Curated Claude/Codex software-engineering skills in `config/developer-skills.json`
 - **Spec Kit bridge** — ADOS preset and extension assets under `spec-kit/` for spec-driven development without vendoring Spec Kit core
 - **99 agent definitions** — Development, review, testing, security, swarm coordination, consensus, optimization
-- **89 slash commands** — Analysis, automation, GitHub integration, hooks, monitoring, optimization, SPARC modes
+- **92 slash commands** — Analysis, automation, GitHub integration, hooks, monitoring, optimization, SPARC modes, Define Done
 - **39 hook handlers** — Routing, memory, learning, session management, security scanning
 - **Framework map** — Canonical registry connecting task types to SPARC roles, RuFlo agents, Claude Code skills, and runtime policy
 
@@ -18,7 +18,7 @@ Cross-framework AI development skills for [Claude Code](https://claude.ai/code).
 git clone https://github.com/anti-enterprises/ados-framework.git
 cd ados-framework
 
-# Minimal: owned assets only (agents, commands, helpers, pipeline)
+# Minimal: owned assets only (agents, commands, helpers, pipeline, bundled skills)
 ./bin/setup
 
 # Full: also install upstream dependencies (gstack, superpowers, claude-flow)
@@ -113,7 +113,7 @@ Recommended flow:
 
 ```
 .claude/
-  commands/       89 slash commands by category
+  commands/       92 slash commands by category
   agents/         99 agent definitions by role
   helpers/        39 hook handlers and utilities
   settings.template.json
@@ -123,7 +123,7 @@ scripts/
   execute-plan/   TypeScript pipeline (11 modules)
 tests/
   execute-plan/   Unit tests (48 tests)
-skills/           Bundled skills (SPARC methodology)
+skills/           Bundled skills (SPARC, Define Done, anti-ai-slop, pin-guard, Karpathy guidelines)
 config/           Default configurations and developer skill catalog
 spec-kit/         ADOS Spec Kit preset and extension assets
 bin/setup         Install script
@@ -142,6 +142,18 @@ ados-framework bundles its own agents, commands, and pipeline. It references (bu
 | [frontend-design](https://github.com/anthropics/skills) | Claude Code plugin | No | UI/UX design patterns for React/Next.js |
 | [context7](https://github.com/upstash/context7) | Claude Code plugin | No | Live documentation fetching |
 | [Spec Kit](https://github.com/github/spec-kit) | GitHub | No | Spec-driven development CLI, templates, commands, and integrations |
+
+## Bundled skills
+
+These skills are vendored in `skills/`, registered in `config/developer-skills.json`, and installed into `.claude/skills` and `.agents/skills` by default:
+
+| Skill | Source | What it provides |
+|---|---|---|
+| `sparc-methodology` | ados-framework | SPARC workflow and helper scripts |
+| `define-done` | [walidboulanouar/define-done](https://github.com/walidboulanouar/define-done) | Binary daily outcome planning and HTML tracker generation |
+| `anti-ai-slop` | [walidboulanouar/anti-ai-slop](https://github.com/walidboulanouar/anti-ai-slop) | Writing audit/rewrite rules and deterministic Python scanners |
+| `pin-guard` | [walidboulanouar/pin-guard](https://github.com/walidboulanouar/pin-guard) | JS/TS dependency pinning and npm supply-chain scanning |
+| `karpathy-guidelines` | [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | Simplicity, surgical-change, and verification guidelines |
 
 ## Development
 

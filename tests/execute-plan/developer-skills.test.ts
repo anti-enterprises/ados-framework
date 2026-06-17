@@ -31,6 +31,10 @@ describe("developer skill catalog", () => {
         "measurement",
         "vercel-deploy",
         "finishing-a-development-branch",
+        "define-done",
+        "anti-ai-slop",
+        "pin-guard",
+        "karpathy-guidelines",
       ]),
     );
   });
@@ -50,9 +54,10 @@ describe("developer skill catalog", () => {
     }
   });
 
-  it("points every path-backed skill at a checked-in source file", () => {
+  it("points every repo-local path-backed skill at a checked-in source file", () => {
     for (const skill of DEVELOPER_SKILL_CATALOG.skills) {
       if (!skill.path) continue;
+      if (skill.path.startsWith("../")) continue;
 
       expect(existsSync(resolve(repoRoot, skill.path)), skill.id).toBe(true);
     }

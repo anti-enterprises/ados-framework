@@ -5,8 +5,9 @@ Cross-framework AI development skills for Claude Code. Bridges gstack (planning)
 ## Quick Start
 
 ```bash
-./bin/setup              # Install owned assets into current project
+./bin/setup              # Install owned assets and bundled skills into current project
 ./bin/setup --full       # Also pull upstream deps (gstack, superpowers, claude-flow)
+./bin/setup --agents=codex  # Install bundled skills for Codex only
 ```
 
 ## Commands
@@ -36,7 +37,7 @@ The framework-map (`scripts/execute-plan/framework-map.ts`) is the central contr
 - `.claude/agents/` — Agent definitions (core, sparc, github, swarm, consensus, optimization, v3, templates)
 - `.claude/helpers/` — Hook handlers (routing, memory, learning, session, security)
 - `scripts/execute-plan/` — TypeScript pipeline (types, normalizer, validator, framework-map, DAG runner)
-- `skills/` — Bundled skills (SPARC methodology)
+- `skills/` — Bundled skills (SPARC methodology, Define Done, anti-ai-slop, pin-guard, Karpathy guidelines)
 - `.agents/skills/` — Codex-facing ADOS wrappers
 - `config/` — Default configurations and curated developer skill catalog
 - `spec-kit/` — ADOS Spec Kit preset and extension assets
@@ -57,6 +58,16 @@ npx tsc --noEmit         # Type check
 | gstack | No | Planning skills — /writing-plans, /ship, /review, /qa |
 | frontend-design (plugin) | No | UI/UX design patterns |
 | Spec Kit | No | Spec-driven development artifacts and agent integrations |
+
+## Bundled Skills
+
+`./bin/setup` installs vendored skills into `.claude/skills` and `.agents/skills` by default:
+
+- `sparc-methodology`
+- `define-done`
+- `anti-ai-slop`
+- `pin-guard`
+- `karpathy-guidelines`
 
 ## Rules
 

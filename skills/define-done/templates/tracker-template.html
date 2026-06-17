@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{TITLE}}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --accent:       #8182C1;
+    --accent-light: #A3A4D8;
+    --bg:           #f0edee;
+    --card:         #fffcfc;
+    --card-tint:    #f8f5f6;
+    --border:       #dddee8;
+    --text:         #14141c;
+    --text-muted:   #9c959f;
+    --dark:         #14141c;
+    --green:        #1d7a3a;
+    --amber:        #c2410c;
+    --red:          #c93535;
+    --radius:       12px;
+    --shadow:       0 2px 12px rgba(20,20,28,0.04);
+    --shadow-lg:    0 6px 28px rgba(20,20,28,0.08);
+    --font-body:    'Inter',-apple-system,sans-serif;
+    --font-mono:    'JetBrains Mono',ui-monospace,monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #14141c;
+      --card:      #1e1e2e;
+      --card-tint: #242436;
+      --border:    #2a2a3e;
+      --text:      #f0edee;
+      --text-muted:#7a7580;
+      --dark:      #f0edee;
+    }
+  }
+
+  body {
+    font-family:var(--font-body);
+    background:var(--bg); color:var(--text); min-height:100vh;
+    padding:40px 24px 80px; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1080px; margin:0 auto; }
+
+  /* HEADER */
+  .header {
+    background:var(--card); border-radius:var(--radius);
+    padding:28px 32px; margin-bottom:20px; box-shadow:var(--shadow);
+    display:flex; justify-content:space-between; align-items:flex-start; gap:24px;
+    border:1px solid var(--border);
+  }
+  .header h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; }
+  .header .brand-tag {
+    display:inline-block;
+    font-family:var(--font-mono); font-size:9px; letter-spacing:2px;
+    color:var(--accent); margin-bottom:8px;
+  }
+  .header .meta {
+    font-family:var(--font-mono); font-size:11px;
+    color:var(--text-muted); letter-spacing:0.5px; margin-top:6px;
+  }
+  .north-star { text-align:right; max-width:380px; font-size:13px; color:var(--text); line-height:1.5; }
+  .north-star-label {
+    font-family:var(--font-mono); font-size:9px;
+    color:var(--accent); letter-spacing:1.5px; margin-bottom:4px;
+  }
+
+  /* TODAY BAR */
+  .today-bar {
+    background:var(--dark); color:var(--bg); border-radius:8px;
+    padding:14px 20px; margin-bottom:24px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-mono); font-size:12px; letter-spacing:1px;
+  }
+  .today-bar .right { opacity:0.6; }
+
+  /* DAY GRID */
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+  .day {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:20px 22px 18px;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column; min-height:280px;
+    border-top:3px solid var(--accent);
+    transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .day:hover { transform:translateY(-1px); box-shadow:var(--shadow-lg); }
+  .day.is-today {
+    border-top-color:var(--dark);
+    box-shadow:var(--shadow-lg);
+    background:var(--card);
+  }
+  .day.is-past { opacity:0.5; }
+  .day.is-future { border-top-color:var(--border); }
+
+  .day-head {
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding-bottom:14px; border-bottom:1px solid var(--border);
+    margin-bottom:14px;
+  }
+  .day-name { font-size:18px; font-weight:700; letter-spacing:-0.3px; }
+  .day-date {
+    font-family:var(--font-mono); font-size:11px;
+    color:var(--text-muted); letter-spacing:0.5px;
+  }
+
+  .outcomes { list-style:none; padding:0; flex:1; }
+  .outcomes li { margin-bottom:12px; }
+  .outcomes label {
+    display:flex; gap:12px; align-items:flex-start;
+    cursor:pointer; line-height:1.4; font-size:14px; color:var(--text);
+  }
+  .outcomes input[type="checkbox"] {
+    appearance:none; width:18px; height:18px; min-width:18px;
+    border:2px solid var(--border); border-radius:4px;
+    background:transparent; cursor:pointer; margin-top:1px;
+    position:relative; transition:border-color 0.15s, background 0.15s;
+  }
+  .outcomes input[type="checkbox"]:hover { border-color:var(--accent); }
+  .outcomes input[type="checkbox"]:checked {
+    background:var(--accent); border-color:var(--accent);
+  }
+  .outcomes input[type="checkbox"]:checked::after {
+    content:''; position:absolute; top:1px; left:4px;
+    width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .outcomes label:has(input:checked) span {
+    text-decoration:line-through; color:var(--text-muted);
+  }
+
+  .day-foot {
+    margin-top:14px; padding-top:12px;
+    border-top:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .stamp {
+    font-family:var(--font-mono); font-size:9px;
+    color:var(--text-muted); letter-spacing:1.5px;
+  }
+  .score {
+    font-family:var(--font-mono); font-size:13px; font-weight:600;
+    color:var(--accent);
+  }
+  .score.full    { color:var(--green); }
+  .score.partial { color:var(--amber); }
+  .score.miss    { color:var(--red); }
+
+  /* WEEKLY ROLLUP */
+  .rollup {
+    margin-top:20px; background:var(--dark); color:var(--bg);
+    border-radius:var(--radius); padding:18px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-mono); font-size:12px; letter-spacing:0.8px;
+  }
+  .rollup .big-num { font-size:32px; font-weight:700; letter-spacing:-1px; color:var(--accent-light); }
+
+  /* RITUAL FOOTER */
+  .ritual {
+    margin-top:32px; background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:22px 28px; box-shadow:var(--shadow);
+    font-size:13px; color:var(--text); line-height:1.7;
+  }
+  .ritual-title {
+    font-family:var(--font-mono); font-size:10px;
+    color:var(--accent); letter-spacing:1.5px; margin-bottom:10px;
+  }
+  .ritual b { font-weight:600; }
+
+  /* FOOTER SIGNATURE */
+  .sig {
+    margin-top:24px; text-align:center;
+    font-family:var(--font-mono); font-size:10px;
+    color:var(--text-muted); letter-spacing:1.5px;
+  }
+  .sig a { color:var(--accent); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <span class="brand-tag">{{BRAND_TAG}}</span>
+      <h1>{{TITLE}}</h1>
+      <div class="meta">{{START_DATE}} → {{END_DATE}} · 5PM HARD STOP · 3 OUTCOMES MAX</div>
+    </div>
+    <div class="north-star">
+      <div class="north-star-label">NORTH STAR</div>
+      {{NORTH_STAR}}
+    </div>
+  </div>
+
+  <div class="today-bar">
+    <span>{{TODAY_LABEL}}</span>
+    <span class="right">DEFINE DONE · DAILY RITUAL</span>
+  </div>
+
+  <div class="grid" id="grid">
+    {{DAYS_HTML}}
+  </div>
+
+  <div class="rollup">
+    <span>WEEKLY SCORECARD · DAYS 3/3</span>
+    <span><span class="big-num" id="hit-count">0</span> / <span id="total-days">0</span></span>
+  </div>
+
+  <div class="ritual">
+    <div class="ritual-title">THE RITUAL</div>
+    {{RITUAL_NOTE}}
+  </div>
+
+  <div class="sig">
+    {{SIGNATURE}}
+  </div>
+
+</div>
+
+<script>
+  const trackerId = document.title.replace(/[^a-z0-9]/gi,'-').toLowerCase();
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => {
+    const key = `dd-${trackerId}-${i}`;
+    cb.checked = localStorage.getItem(key) === '1';
+    cb.addEventListener('change', () => {
+      localStorage.setItem(key, cb.checked ? '1' : '0');
+      updateScores();
+    });
+  });
+  function updateScores() {
+    let hit = 0, total = 0;
+    document.querySelectorAll('.day').forEach(day => {
+      total++;
+      const boxes = day.querySelectorAll('input[type="checkbox"]');
+      const checked = day.querySelectorAll('input[type="checkbox"]:checked').length;
+      const score = day.querySelector('.score');
+      if (score) {
+        score.textContent = `${checked}/${boxes.length}`;
+        score.classList.remove('full','partial','miss');
+        if (boxes.length > 0 && checked === boxes.length) { hit++; score.classList.add('full'); }
+        else if (checked === 0) score.classList.add('miss');
+        else score.classList.add('partial');
+      }
+    });
+    document.getElementById('hit-count').textContent = hit;
+    document.getElementById('total-days').textContent = total;
+  }
+  updateScores();
+</script>
+</body>
+</html>

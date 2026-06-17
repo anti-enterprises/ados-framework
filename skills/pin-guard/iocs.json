@@ -1,0 +1,81 @@
+{
+  "updated": "2026-06-12",
+  "source_incident": "npm whitespace-injector / blockchain dead-drop RAT, 2026. Entry point: unpinned npx <pkg>@latest.",
+  "compromised_packages": {
+    "mgc": {
+      "bad_versions": [
+        "1.2.1",
+        "1.2.2",
+        "1.2.3",
+        "1.2.4"
+      ],
+      "detail": "Account takeover Apr 2, 2026. setup.cjs dropper fetches OS-specific RAT from GitHub Gist. Attributed UNC1069.",
+      "source": "https://safedep.io/malicious-npm-mgc-compromised-rat/"
+    },
+    "axios": {
+      "bad_versions": [
+        "1.12.3"
+      ],
+      "detail": "March 2026 compromise, WAVESHAPER.V2 RAT payload.",
+      "source": "https://cloud.google.com/blog/topics/threat-intelligence/north-korea-threat-actor-targets-axios-npm-package"
+    }
+  },
+  "code_markers": [
+    "global['!']",
+    "global[\"!\"]",
+    "_$_1e42",
+    "_$_ccfc",
+    "_$af163278",
+    "'A4-1928'",
+    "'9-343'",
+    "'8-2914-2'"
+  ],
+  "c2_blockchain_hosts": [
+    "api.trongrid.io",
+    "bsc-dataseed.binance.org",
+    "bsc-rpc.publicnode.com",
+    "fullnode.mainnet.aptoslabs.com"
+  ],
+  "loader_behavior": {
+    "detail": "Stage-2 is a blockchain dead-drop RAT loader. Reverse-engineered from a real sample: reads a TRON wallet's latest tx data, reverses it to a BSC tx hash, fetches that tx input, decodes hex to a command, and runs it via child_process spawn('node','-e', cmd). Full remote code execution on demand.",
+    "code_patterns": [
+      "child_process",
+      "eth_getTransactionByHash",
+      "only_confirmed=true&only_from=true",
+      "spawn",
+      "node",
+      "-e"
+    ],
+    "c2_last_seen": "2026-05-23"
+  },
+  "config_injection": {
+    "files": [
+      "postcss.config.mjs",
+      "postcss.config.js",
+      "next.config.js",
+      "next.config.mjs",
+      "vue.config.js",
+      "eslint.config.mjs",
+      "eslint.config.js",
+      "jest.config.js",
+      "jest.config.mjs",
+      "astro.config.js",
+      "astro.config.mjs"
+    ],
+    "max_normal_bytes": 4096,
+    "detail": "Whitespace injector hides payload after ~280 spaces on the export default line. Invisible in editors and git diffs."
+  },
+  "gitignore_markers": [
+    ".bat"
+  ],
+  "dropper_files": [
+    "setup.cjs"
+  ],
+  "wallets_tron": [
+    "TMfKQEd7TJJa5xNZJZ2Lep838vrzrs7mAP",
+    "TXfxHUet9pJVU1BgVkBAbrES4YUc1nGzcG"
+  ],
+  "suspicious_ips": [
+    "166.88.54.158"
+  ]
+}

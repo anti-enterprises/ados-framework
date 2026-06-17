@@ -73,6 +73,34 @@
       "path": "skills/vercel-react-best-practices",
       "install": "claude skills install vercel-labs/agent-skills:skills/vercel-react-best-practices",
       "description": "React/Next.js performance optimization from Vercel Engineering"
+    },
+    "define-done": {
+      "source": "github",
+      "repo": "walidboulanouar/define-done",
+      "path": "skills/define-done",
+      "install": "claude skills install walidboulanouar/define-done:skills/define-done",
+      "description": "Daily outcome planning and branded HTML tracker generation"
+    },
+    "anti-ai-slop": {
+      "source": "github",
+      "repo": "walidboulanouar/anti-ai-slop",
+      "path": "skill",
+      "install": "claude skills install walidboulanouar/anti-ai-slop:skill",
+      "description": "Writing audit and rewrite rules for removing AI tells"
+    },
+    "pin-guard": {
+      "source": "github",
+      "repo": "walidboulanouar/pin-guard",
+      "path": ".",
+      "install": "claude skills install walidboulanouar/pin-guard:.",
+      "description": "Dependency pinning and npm supply-chain scanning for JS/TS repos"
+    },
+    "karpathy-guidelines": {
+      "source": "github",
+      "repo": "multica-ai/andrej-karpathy-skills",
+      "path": "skills/karpathy-guidelines",
+      "install": "claude skills install multica-ai/andrej-karpathy-skills:skills/karpathy-guidelines",
+      "description": "Behavioral coding guidelines for simple, surgical, verified changes"
     }
   }
 }

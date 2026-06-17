@@ -147,7 +147,15 @@ copy_dir "$SCRIPT_DIR/scripts/execute-plan" "$TARGET_DIR/scripts/execute-plan" "
 copy_dir "$SCRIPT_DIR/tests/execute-plan" "$TARGET_DIR/tests/execute-plan" "execute-plan tests"
 
 # Skills
-copy_dir "$SCRIPT_DIR/skills" "$TARGET_DIR/skills" "SPARC methodology skill"
+copy_dir "$SCRIPT_DIR/skills" "$TARGET_DIR/skills" "bundled skills (root compatibility)"
+
+if [ "$AGENTS" = "claude" ] || [ "$AGENTS" = "both" ]; then
+  copy_dir "$SCRIPT_DIR/skills" "$TARGET_DIR/.claude/skills" "Claude bundled skills"
+fi
+
+if [ "$AGENTS" = "codex" ] || [ "$AGENTS" = "both" ]; then
+  copy_dir "$SCRIPT_DIR/skills" "$TARGET_DIR/.agents/skills" "Codex bundled skills"
+fi
 
 # Developer skill catalog
 copy_dir "$SCRIPT_DIR/config" "$TARGET_DIR/config" "ADOS configuration"

@@ -269,6 +269,38 @@
       "agentTargets": ["claude", "codex"]
     },
     {
+      "id": "define-done",
+      "name": "define-done",
+      "category": "planning",
+      "source": "ados",
+      "path": "skills/define-done/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "anti-ai-slop",
+      "name": "anti-ai-slop",
+      "category": "documentation",
+      "source": "ados",
+      "path": "skills/anti-ai-slop/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "pin-guard",
+      "name": "pin-guard",
+      "category": "security",
+      "source": "ados",
+      "path": "skills/pin-guard/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
+      "id": "karpathy-guidelines",
+      "name": "karpathy-guidelines",
+      "category": "workflow",
+      "source": "ados",
+      "path": "skills/karpathy-guidelines/SKILL.md",
+      "agentTargets": ["claude", "codex"]
+    },
+    {
       "id": "context7",
       "name": "context7",
       "category": "research",
