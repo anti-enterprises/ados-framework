@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+STRICT=false
+
+case "${1:-}" in
+  "") ;;
+  --strict) STRICT=true ;;
+  --help|-h)
+    echo "Usage: ./bin/check-harness [--strict]"
+    echo "Read-only check for the optional machine-level ECC harness."
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $1" >&2
+    exit 2
+    ;;
+esac
+
+resolve_command() {
+  if command -v "$1" >/dev/null 2>&1; then
+    command -v "$1"
+  elif [ -x "$HOME/.local/bin/$1" ]; then
+    printf '%s\n' "$HOME/.local/bin/$1"
+  else
+    return 1
+  fi
+}
+
+DOCTOR="$(resolve_command harness-doctor || true)"
+SEARCH="$(resolve_command harness-search || true)"
+CATALOG="$(resolve_command harness-catalog || true)"
+missing=()
+[ -n "$DOCTOR" ] || missing+=("harness-doctor")
+[ -n "$SEARCH" ] || missing+=("harness-search")
+[ -n "$CATALOG" ] || missing+=("harness-catalog")
+
+if [ "${#missing[@]}" -gt 0 ]; then
+  echo "[ados] Shared ECC harness unavailable: missing ${missing[*]}"
+  echo "[ados] ADOS project-local assets remain usable; install the global base through the machine harness manager."
+  if $STRICT; then exit 1; fi
+  exit 0
+fi
+
+doctor_args=()
+if $STRICT; then doctor_args+=(--strict); fi
+"$DOCTOR" "${doctor_args[@]}"
+"$CATALOG" verify --json >/dev/null
+"$SEARCH" --kind agent planner --limit 1 --json >/dev/null
+echo "[ados] Shared ECC harness is healthy and searchable."

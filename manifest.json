@@ -3,6 +3,16 @@
   "version": "1",
   "description": "Upstream dependency manifest for ados-framework. Used by bin/setup to pull and configure external packages.",
   "upstreams": {
+    "ecc": {
+      "source": "github",
+      "repo": "affaan-m/ECC",
+      "ref": "ed387446052dfbc6b52de149406b70efa65edc59",
+      "version": "2.0.0",
+      "required": false,
+      "install": "Managed by the machine-level harness; ADOS does not mutate global harness configuration",
+      "verify": "bin/check-harness --strict",
+      "description": "Optional shared base for ChatGPT/Codex, Claude Code, and OpenCode"
+    },
     "claude-flow": {
       "source": "npm",
       "package": "@claude-flow/cli",

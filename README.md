@@ -136,12 +136,32 @@ ados-framework bundles its own agents, commands, and pipeline. It references (bu
 
 | Package | Source | Required | What it provides |
 |---|---|---|---|
+| [ECC](https://github.com/affaan-m/ECC) | GitHub, pinned to `ed387446052dfbc6b52de149406b70efa65edc59` | No | Shared cross-harness skills, agents, workflows, rules, hooks, and MCP definitions |
 | [claude-flow](https://github.com/ruvnet/claude-flow) | npm `@claude-flow/cli` | Yes | Agent spawning, task management, swarm coordination, memory |
 | [superpowers](https://github.com/obra/superpowers) | Claude Code plugin | Yes | Core workflow skills — brainstorming, TDD, debugging, verification |
 | [gstack](https://github.com/garrytan/gstack) | GitHub | No | Planning and QA — /writing-plans, /ship, /review, /qa, /browse |
 | [frontend-design](https://github.com/anthropics/skills) | Claude Code plugin | No | UI/UX design patterns for React/Next.js |
 | [context7](https://github.com/upstash/context7) | Claude Code plugin | No | Live documentation fetching |
 | [Spec Kit](https://github.com/github/spec-kit) | GitHub | No | Spec-driven development CLI, templates, commands, and integrations |
+
+### Shared harness boundary
+
+ADOS is a project overlay, not a global harness installer. On machines with the
+ECC-first Anti harness, ChatGPT/Codex, Claude Code, and OpenCode share the same
+complete ECC catalog while loading exact capabilities on demand. ADOS keeps
+ownership of its execution graph, project-local agents, commands, and bundled
+skills.
+
+Check the machine-level integration without changing it:
+
+```bash
+./bin/check-harness
+./bin/check-harness --strict
+```
+
+If the shared harness is unavailable, ADOS continues to use its project-local
+assets. Install or reset the global harness through the machine's harness
+manager, not through `bin/setup`.
 
 ## Bundled skills
 
