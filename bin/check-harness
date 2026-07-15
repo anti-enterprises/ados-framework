@@ -47,4 +47,34 @@ if $STRICT; then doctor_args+=(--strict); fi
 "$DOCTOR" "${doctor_args[@]}"
 "$CATALOG" verify --json >/dev/null
 "$SEARCH" --kind agent planner --limit 1 --json >/dev/null
-echo "[ados] Shared ECC harness is healthy and searchable."
+
+compatibility_ok=true
+require_capability() {
+  local kind="$1"
+  local query="$2"
+  local expected_id="$3"
+  local result
+  if ! result="$("$SEARCH" --kind "$kind" "$query" --limit 10 --json)"; then
+    echo "[ados] Shared harness search failed while checking: $expected_id" >&2
+    compatibility_ok=false
+    return 0
+  fi
+  if ! grep -Fq "\"id\": \"$expected_id\"" <<<"$result"; then
+    echo "[ados] Shared harness is missing required capability: $expected_id" >&2
+    compatibility_ok=false
+  fi
+}
+
+require_capability router growth-marketing anti:router:growth-marketing
+require_capability router design-production anti:router:design-production
+require_capability skill anti-ai-slop anti:skill:anti-ai-slop
+require_capability skill product-marketing anti:library:product-marketing
+require_capability skill setup-gbrain anti:library:setup-gbrain
+
+if ! $compatibility_ok; then
+  echo "[ados] Shared ECC harness is installed but lacks the retained-skill contract."
+  if $STRICT; then exit 1; fi
+  exit 0
+fi
+
+echo "[ados] Shared ECC harness is healthy, searchable, and retained-skill compatible."

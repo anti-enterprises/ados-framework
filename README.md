@@ -148,9 +148,11 @@ ados-framework bundles its own agents, commands, and pipeline. It references (bu
 
 ADOS is a project overlay, not a global harness installer. On machines with the
 ECC-first Anti harness, ChatGPT/Codex, Claude Code, and OpenCode share the same
-complete ECC catalog while loading exact capabilities on demand. ADOS keeps
+complete ECC catalog, 12 compact routers, and ten explicitly retained global
+skills. Larger growth, design, and gstack extension collections stay searchable
+and load on demand instead of being registered in every task. ADOS keeps
 ownership of its execution graph, project-local agents, commands, and bundled
-skills.
+skills; it does not duplicate the shared catalog.
 
 Check the machine-level integration without changing it:
 
